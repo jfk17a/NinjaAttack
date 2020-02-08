@@ -20,6 +20,9 @@
 
 /* Begin PBXFileReference section */
 		5C2901821F8F6DE700803663 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = NinjaAttack/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8897E86F23EEFF3A00ECDEAB /* egg_splat.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = egg_splat.caf; sourceTree = "<group>"; };
+		8897E87023EEFF9E00ECDEAB /* egg_throw.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = egg_throw.caf; sourceTree = "<group>"; };
+		8897E87123EF047C00ECDEAB /* background.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = background.caf; sourceTree = "<group>"; };
 		88E14B1123E7862200CC9FF9 /* GameOverScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = SOURCE_ROOT; };
 		AFD63F862036493600E08C66 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GameViewController.swift; path = NinjaAttack/GameViewController.swift; sourceTree = "<group>"; };
 		AFD63F882036497100E08C66 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GameScene.swift; path = NinjaAttack/GameScene.swift; sourceTree = "<group>"; };
@@ -47,6 +50,9 @@
 			isa = PBXGroup;
 			children = (
 				AFD63F8D203649F800E08C66 /* background-music-aac.caf */,
+				8897E87123EF047C00ECDEAB /* background.caf */,
+				8897E86F23EEFF3A00ECDEAB /* egg_splat.caf */,
+				8897E87023EEFF9E00ECDEAB /* egg_throw.caf */,
 				AFD63F8E203649F800E08C66 /* pew-pew-lei.caf */,
 			);
 			name = Sounds;

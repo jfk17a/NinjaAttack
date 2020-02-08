@@ -71,16 +71,52 @@ extension CGPoint {
 class GameScene: SKScene {
   
   let player = SKSpriteNode(imageNamed: "player")
+  var scoreLabel: SKLabelNode!
+  var score = 0 {
+    didSet{
+      scoreLabel.text = "Score: \(score)"
+    }
+  }
+  var monsterLabel: SKLabelNode!
   var monstersDestroyed = 0
+//  {
+//    didSet{
+//      monsterLabel.text = "Monsters Killed: \(monstersDestroyed)"
+//    }
+//  }
 
     
   override func didMove(to view: SKView) {
-    backgroundColor = SKColor.white
+    backgroundColor = SKColor.green
+    
+//    monsterLabel = SKLabelNode(fontNamed: "Chalkduster")
+//    monsterLabel.text = "Monsters Killed: 0"
+//    monsterLabel.horizontalAlignmentMode = .left
+//    monsterLabel.position = CGPoint(x: 20, y: 365)
+//    addChild(monsterLabel)
+    
+    scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
+    scoreLabel.text = "Score: 0"
+    scoreLabel.horizontalAlignmentMode = .left
+    scoreLabel.position = CGPoint(x: 20, y: 365/*320*/)
+    addChild(scoreLabel)
+    
     player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.5)
     addChild(player)
     
     physicsWorld.gravity = .zero
     physicsWorld.contactDelegate = self
+    
+    let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf.caf")
+    backgroundMusic.autoplayLooped = true
+    addChild(backgroundMusic)
+    
+    run(SKAction.repeatForever(
+      SKAction.sequence([
+        SKAction.run(addTrees),
+        SKAction.wait(forDuration: Double.random(in: 1...3))
+        ])
+    ))
     
     run(SKAction.repeatForever(
       SKAction.sequence([
@@ -88,11 +124,6 @@ class GameScene: SKScene {
         SKAction.wait(forDuration: 1.0)
         ])
     ))
-    
-    let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf")
-    backgroundMusic.autoplayLooped = true
-    addChild(backgroundMusic)
-
   }
   
   func random() -> CGFloat {
@@ -105,24 +136,27 @@ class GameScene: SKScene {
 
   func addMonster() {
     
+    var randoMonster = Int.random(in: 1...3)
+    
+    
     // Create sprite
-    let monster = SKSpriteNode(imageNamed: "monster")
+    let ghost = SKSpriteNode(imageNamed: "monster\(randoMonster)")
     
     // Determine where to spawn the monster along the Y axis
-    let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
+    let actualY = random(min: ghost.size.height/2, max: size.height - ghost.size.height/2)
     
     // Position the monster slightly off-screen along the right edge,
     // and along a random position along the Y axis as calculated above
-    monster.position = CGPoint(x: size.width + monster.size.width/2, y: actualY)
+    ghost.position = CGPoint(x: size.width + ghost.size.width/2, y: actualY)
     
     // Add the monster to the scene
-    addChild(monster)
+    addChild(ghost)
     
     // Determine speed of the monster
     let actualDuration = random(min: CGFloat(2.0), max: CGFloat(4.0))
     
     // Create the actions
-    let actionMove = SKAction.move(to: CGPoint(x: -monster.size.width/2, y: actualY),
+    let actionMove = SKAction.move(to: CGPoint(x: -ghost.size.width/2, y: actualY),
                                    duration: TimeInterval(actualDuration))
     let actionMoveDone = SKAction.removeFromParent()
     
@@ -132,14 +166,47 @@ class GameScene: SKScene {
       let gameOverScene = GameOverScene(size: self.size, won: false)
       self.view?.presentScene(gameOverScene, transition: reveal)
     }
-    monster.run(SKAction.sequence([actionMove, loseAction, actionMoveDone]))
+    ghost.run(SKAction.sequence([actionMove, loseAction, actionMoveDone]))
 
     
-    monster.physicsBody = SKPhysicsBody(rectangleOf: monster.size) // 1
-    monster.physicsBody?.isDynamic = true // 2
-    monster.physicsBody?.categoryBitMask = PhysicsCategory.monster // 3
-    monster.physicsBody?.contactTestBitMask = PhysicsCategory.projectile // 4
-    monster.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
+    ghost.physicsBody = SKPhysicsBody(rectangleOf: ghost.size) // 1
+    ghost.physicsBody?.isDynamic = true // 2
+    ghost.physicsBody?.categoryBitMask = PhysicsCategory.monster // 3
+    ghost.physicsBody?.contactTestBitMask = PhysicsCategory.projectile // 4
+    ghost.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
+
+  }
+  
+  func addTrees() {
+    
+    var randoTree = Int.random(in: 1...3)
+    
+    
+    // Create sprite
+    let tree = SKSpriteNode(imageNamed: "tree\(randoTree)")
+    
+    // Determine where to spawn the Tree along the Y axis
+    let actualY = random(min: tree.size.height/2, max: size.height - tree.size.height/2)
+    
+    // Position the monster slightly off-screen along the right edge,
+    // and along a random position along the Y axis as calculated above
+    tree.position = CGPoint(x: size.width + tree.size.width/2, y: actualY)
+    
+    // Add the monster to the scene
+    addChild(tree)
+    
+    // Determine speed of the monster
+    let actualDuration = 5
+    
+    // Create the actions
+    let actionMove = SKAction.move(to: CGPoint(x: -tree.size.width/2, y: actualY),
+                                   duration: TimeInterval(actualDuration))
+    let actionMoveDone = SKAction.removeFromParent()
+    
+    let loseAction = SKAction.run() {
+    }
+    
+    tree.run(SKAction.sequence([actionMove, loseAction, actionMoveDone]))
 
   }
   
@@ -148,6 +215,9 @@ class GameScene: SKScene {
     guard let touch = touches.first else {
       return
     }
+    
+    run(SKAction.playSoundFileNamed("egg_throw.caf", waitForCompletion: false))
+    
     let touchLocation = touch.location(in: self)
     
     // Set up initial location of projectile
@@ -183,31 +253,31 @@ class GameScene: SKScene {
     projectile.physicsBody?.contactTestBitMask = PhysicsCategory.monster
     projectile.physicsBody?.collisionBitMask = PhysicsCategory.none
     projectile.physicsBody?.usesPreciseCollisionDetection = true
-    
-    run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
 
   }
   
   func projectileDidCollideWithMonster(projectile: SKSpriteNode, monster: SKSpriteNode) {
+    run(SKAction.playSoundFileNamed("egg_splat.caf", waitForCompletion: false))
     print("Hit")
     projectile.removeFromParent()
     monster.removeFromParent()
-    
+    score += 1
     monstersDestroyed += 1
-    if monstersDestroyed > 30 {
+    if monstersDestroyed == 10{
+      for _ in 1...10{
+        addMonster()
+      }
+    }
+    if monstersDestroyed > 25{
       let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
       let gameOverScene = GameOverScene(size: self.size, won: true)
       view?.presentScene(gameOverScene, transition: reveal)
     }
-    
   }
-
-  
 }
 
 extension GameScene: SKPhysicsContactDelegate {
   func didBegin(_ contact: SKPhysicsContact) {
-    
     var firstBody: SKPhysicsBody
     var secondBody: SKPhysicsBody
     if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
